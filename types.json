@@ -1,0 +1,13 @@
+{
+    "CurrencyId": {
+        "_enum": [
+            "Dinar",
+            "JUSD",
+            "JEUR",
+            "JCHF"
+        ]
+    },
+    "CurrencyIdOf": "CurrencyId",
+    "Amount": "i128",
+    "AmountOf": "Amount"
+}
