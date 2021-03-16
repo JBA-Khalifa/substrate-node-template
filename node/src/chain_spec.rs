@@ -1,7 +1,7 @@
 use sp_core::{Pair, Public, sr25519};
 use node_template_runtime::{
 	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig,
-	SudoConfig, SystemConfig, WASM_BINARY, Signature
+	SudoConfig, SystemConfig, WASM_BINARY, Signature, TokensConfig, CurrencyId,
 };
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_finality_grandpa::AuthorityId as GrandpaId;
@@ -39,6 +39,10 @@ pub fn authority_keys_from_seed(s: &str) -> (AuraId, GrandpaId) {
 }
 
 pub fn development_config() -> Result<ChainSpec, String> {
+	let mut properties = Map::new();
+	properties.insert("tokenSymbol".into(), "TEST".into());
+	properties.insert("tokenDecimals".into(), 15.into());
+
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm binary not available".to_string())?;
 
 	Ok(ChainSpec::from_genesis(
@@ -71,7 +75,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		// Protocol ID
 		None,
 		// Properties
-		None,
+		Some(properties),
 		// Extensions
 		None,
 	))
@@ -153,6 +157,16 @@ fn testnet_genesis(
 			// Assign network admin rights.
 			key: root_key,
 		}),
-		stp258_tokens: Default::default(),
+		stp258_tokens: Some(TokensConfig {
+			endowed_accounts: endowed_accounts
+			.iter()
+			.flat_map(|x| {
+				vec![
+					(x.clone(), CurrencyId::JUSD, 10u128.pow(16)),
+					(x.clone(), CurrencyId::JCHF, 10u128.pow(16)),
+				]
+			})
+			.collect(),
+		}),
 	}
 }
